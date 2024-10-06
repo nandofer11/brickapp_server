@@ -4,6 +4,8 @@ const app = express();
 const mysql = require('mysql');
 const cors = require('cors'); 
 
+const personalRoutes = require('./routes/personal');
+
 app.use(express.json());
 app.use(cors());
 
@@ -30,6 +32,12 @@ db.connect((err) => {
     }
 });
 
+// Middleware para asignar la conexión a la base de datos en cada request
+app.use((req, res, next) => {
+    req.db = db;  // Asignar la conexión de la base de datos a `req`
+    next();       // Continuar con la siguiente función de middleware o ruta
+});
+
 // Rutas
 app.post('/login', (req, res)=>{
     // Obtener valores enviadas desde el frontend
@@ -53,3 +61,6 @@ app.post('/login', (req, res)=>{
         }
     })
 })
+
+// Usar rutas de personal con prefijo /admin/personal
+app.use('/admin/personal', personalRoutes);
