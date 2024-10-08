@@ -5,6 +5,9 @@ const mysql = require('mysql');
 const cors = require('cors'); 
 
 const personalRoutes = require('./routes/personal');
+const coccionRoutes = require('./routes/coccion');
+const hornosRoutes = require('./routes/hornos');
+const cargoCoccionRoutes = require('./routes/cargo_coccion');
 
 app.use(express.json());
 app.use(cors());
@@ -38,8 +41,8 @@ app.use((req, res, next) => {
     next();       // Continuar con la siguiente función de middleware o ruta
 });
 
-// Rutas
-app.post('/login', (req, res)=>{
+// Ruta Login
+app.post('/api/login', (req, res)=>{
     // Obtener valores enviadas desde el frontend
     const usuarioEnviadoLogin = req.body.LoginUsuario;
     const contraseñaEnviadoLogin = req.body.LoginContraseña;
@@ -62,5 +65,8 @@ app.post('/login', (req, res)=>{
     })
 })
 
-// Usar rutas de personal con prefijo /admin/personal
-app.use('/admin/personal', personalRoutes);
+// Rutas 
+app.use('/api/admin/personal', personalRoutes);
+app.use('/api/admin/coccion', coccionRoutes);
+app.use('/api/admin/hornos', hornosRoutes);
+app.use('/api/admin/cargoCoccion', cargoCoccionRoutes);
