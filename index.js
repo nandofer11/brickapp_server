@@ -16,6 +16,7 @@ const almacenesMaterialRoutes = require('./routes/almacenesMaterial');
 const materialesRoutes = require('./routes/material');
 const comprasMaterialRoutes = require('./routes/comprasmaterial');
 const proveedorRoutes = require('./routes/proveedor');
+const authRoutes = require('./routes/auth');
 
 
 app.use(express.json());
@@ -48,23 +49,21 @@ app.listen(3002, ()=>{
 })
 
 
-// Crear un pool en vez de una única conexión
-const db = mysql.createPool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    connectionLimit: 10 // Ajusta el límite de conexiones
+// Crear conexión a la base de datos
+const db = mysql.createConnection({
+    user: process.env.DB_USER || 'root',
+    host: process.env.DB_HOST || 'localhost',
+    password: process.env.DB_PASSWORD || 'root',
+    database: process.env.DB_NAME || 'bdbrickapp',
+    port: process.env.DB_PORT || 3306
 });
 
-// Verifica la conexión al iniciar la aplicación
-db.getConnection((err, connection) => {
+// Verifica la conexión a MySQL
+db.connect((err) => {
     if (err) {
-        console.error('Error al conectar a la base de datos:', err);
+        console.error('Error conectando a la base de datos:', err);
     } else {
         console.log('Conexión a la base de datos exitosa');
-        connection.release(); // Libera la conexión después de probar
     }
 });
 
@@ -74,31 +73,9 @@ app.use((req, res, next) => {
     next();       // Continuar con la siguiente función de middleware o ruta
 });
 
-// Ruta Login
-app.post('/api/login', (req, res)=>{
-    // Obtener valores enviadas desde el frontend
-    const usuarioEnviadoLogin = req.body.LoginUsuario;
-    const contraseñaEnviadoLogin = req.body.LoginContraseña;
-
-    // Crear sentencia sql para login en la tabla usuarios de la bd
-    const SQL = 'SELECT * from usuario where usuario = ? && contraseña = ?';
-    const Values = [usuarioEnviadoLogin, contraseñaEnviadoLogin];
-
-    // Ejecuta la sentencia SQL
-    db.query(SQL, Values, (err, results)=>{
-        if(err){
-            res.send({error: err});
-        }
-        if(results.length > 0){
-            res.send(results)
-        }
-        else{
-            res.send({message: `Credenciales no coinciden!`})
-        }
-    })
-})
 
 // Rutas 
+app.use('/api/admin/auth', authRoutes);
 app.use('/api/admin/personal', personalRoutes);
 app.use('/api/admin/coccion', coccionRoutes);
 app.use('/api/admin/hornos', hornosRoutes);
