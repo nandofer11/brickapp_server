@@ -47,13 +47,14 @@ app.listen(3002, ()=>{
     console.log("Servidor corriendo en el puerto 3002");
 })
 
-// Crear bd
+
+// Crear conexión a la base de datos
 const db = mysql.createConnection({
-    user: 'root',
-    host: 'localhost',
-    password: 'root',
-    database: 'bdbrickapp',
-    port: 3306
+    user: process.env.DB_USER || 'root',
+    host: process.env.DB_HOST || 'localhost',
+    password: process.env.DB_PASSWORD || 'root',
+    database: process.env.DB_NAME || 'bdbrickapp',
+    port: process.env.DB_PORT || 3306
 });
 
 // Verifica la conexión a MySQL
