@@ -1,0 +1,47 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Debugger configurations
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Coverage directory used by testing tools
+coverage/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Optional npm cache directory
+.npm/
+
+# Dependency directories
+bower_components/
+
+# Build directories
+dist/
+build/
+
+# Editor-specific configurations
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Swagger generated files (optional if using Swagger-UI locally)
+swagger.yaml
+swagger-output.yaml
