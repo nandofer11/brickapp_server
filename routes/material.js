@@ -41,14 +41,15 @@ const router = express.Router();
 
 // Obtener todos los materiales
 router.get('/', (req, res) => {
-    const sql = "SELECT * FROM material";
-    req.db.query(sql, (err, results) => {
+    req.db.query("SELECT * FROM material", (err, results) => {
         if (err) {
-            return res.status(500).json({ error: err.message });
+            console.error("Error en la consulta:", err);
+            return res.status(500).json({ error: 'Error en la conexión a la base de datos' });
         }
         res.status(200).json(results);
     });
 });
+
 
 /**
  * @swagger

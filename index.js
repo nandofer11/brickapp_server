@@ -48,21 +48,23 @@ app.listen(3002, ()=>{
 })
 
 
-// Crear conexión a la base de datos
-const db = mysql.createConnection({
-    user: process.env.DB_USER || 'root',
-    host: process.env.DB_HOST || 'localhost',
-    password: process.env.DB_PASSWORD || 'root',
-    database: process.env.DB_NAME || 'bdbrickapp',
-    port: process.env.DB_PORT || 3306
+// Crear un pool en vez de una única conexión
+const db = mysql.createPool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    connectionLimit: 10 // Ajusta el límite de conexiones
 });
 
-// Verifica la conexión a MySQL
-db.connect((err) => {
+// Verifica la conexión al iniciar la aplicación
+db.getConnection((err, connection) => {
     if (err) {
-        console.error('Error conectando a la base de datos:', err);
+        console.error('Error al conectar a la base de datos:', err);
     } else {
         console.log('Conexión a la base de datos exitosa');
+        connection.release(); // Libera la conexión después de probar
     }
 });
 
