@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const cargoCoccionController = require('../controllers/cargoCoccionController');
 
 /**
  * @swagger
@@ -42,16 +43,7 @@ const router = express.Router();
  *         description: Error en el servidor
  */
 // Listar todos los cargos de cocción
-router.get('/', (req, res) => {
-    const sql = `SELECT * FROM cargo_coccion`;
-
-    req.db.query(sql, (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(200).json(results);
-    });
-});
+router.get('/', cargoCoccionController.list);
 
 /**
  * @swagger
@@ -79,20 +71,7 @@ router.get('/', (req, res) => {
  *         description: Error en el servidor
  */
 // Obtener un solo cargo de cocción por ID
-router.get('/:id', (req, res) => {
-    const { id } = req.params;
-    const sql = `SELECT * FROM cargo_coccion WHERE id_cargo_coccion = ?`;
-
-    req.db.query(sql, [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Cargo de cocción no encontrado' });
-        }
-        res.status(200).json(result[0]);
-    });
-});
+router.get('/:id', cargoCoccionController.getById);
 
 /**
  * @swagger
@@ -125,22 +104,7 @@ router.get('/:id', (req, res) => {
  */
 
 // Registrar un nuevo cargo de cocción
-router.post('/', (req, res) => {
-    const { nombre_cargo, costo_cargo } = req.body;
-
-    if (!nombre_cargo || !costo_cargo) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-    }
-
-    const sql = `INSERT INTO cargo_coccion (nombre_cargo, costo_cargo) VALUES (?, ?)`;
-
-    req.db.query(sql, [nombre_cargo, costo_cargo], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ message: 'Cargo de cocción creado exitosamente', id_cargo_coccion: result.insertId });
-    });
-});
+router.post('/', cargoCoccionController.register);
 
 /**
  * @swagger
@@ -172,26 +136,7 @@ router.post('/', (req, res) => {
  *         description: Error en el servidor
  */
 // Editar un cargo de cocción
-router.put('/:id', (req, res) => {
-    const { id } = req.params;
-    const { nombre_cargo, costo_cargo } = req.body;
-
-    if (!nombre_cargo|| !costo_cargo) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-    }
-
-    const sql = `UPDATE cargo_coccion SET nombre_cargo = ?, costo_cargo = ? WHERE id_cargo_coccion = ?`;
-
-    req.db.query(sql, [nombre_cargo, costo_cargo, id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Cargo de cocción no encontrado' });
-        }
-        res.status(200).json({ message: 'Cargo de cocción actualizado exitosamente' });
-    });
-});
+router.put('/:id', cargoCoccionController.update);
 
 /**
  * @swagger
@@ -215,21 +160,7 @@ router.put('/:id', (req, res) => {
  *         description: Error en el servidor
  */
 // Eliminar un cargo de cocción
-router.delete('/:id', (req, res) => {
-    const { id } = req.params;
-
-    const sql = `DELETE FROM cargo_coccion WHERE id_cargo_coccion = ?`;
-
-    req.db.query(sql, [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Cargo de cocción no encontrado' });
-        }
-        res.status(200).json({ message: 'Cargo de cocción eliminado exitosamente' });
-    });
-});
+router.delete('/:id', cargoCoccionController.delete);
 
 
 module.exports = router;

@@ -5,10 +5,10 @@ const router = express.Router();
 router.get('/', (req, res) => {
   const query = `
     SELECT pdc.*, p.nombre AS proveedor, m.nombre AS material, cm.fecha_compra
-    FROM detalle_compra_material_proveedor pdc
+    FROM compra_detalle pdc
     INNER JOIN proveedor p ON pdc.id_proveedor = p.id_proveedor
     INNER JOIN material m ON pdc.id_material = m.id_material
-    INNER JOIN compra_material cm ON pdc.id_compra_material = cm.id_compra_material
+    INNER JOIN compra cm ON pdc.id_compra = cm.id_compra
   `;
 
   req.db.query(query, (err, results) => {
@@ -23,11 +23,11 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const query = `
     SELECT pdc.*, p.nombre AS proveedor, m.nombre AS material, cm.fecha_compra
-    FROM detalle_compra_material_proveedor pdc
+    FROM compra_detalle pdc
     INNER JOIN proveedor p ON pdc.id_proveedor = p.id_proveedor
     INNER JOIN material m ON pdc.id_material = m.id_material
-    INNER JOIN compra_material cm ON pdc.id_compra_material = cm.id_compra_material
-    WHERE pdc.id_proveedor_detalle_compra_material = ?
+    INNER JOIN compra cm ON pdc.id_compra = cm.id_compra
+    WHERE pdc.id_compra_detalle = ?
   `;
 
   req.db.query(query, [req.params.id], (err, result) => {
@@ -43,13 +43,13 @@ router.get('/:id', (req, res) => {
 
 // Crear un nuevo detalle de compra de material
 router.post('/', (req, res) => {
-  const { cantidad, precio_compra, id_proveedor, id_compra_material, id_material } = req.body;
+  const { cantidad, precio_compra, id_proveedor, id_compra, id_material } = req.body;
 
   const query = `
-    INSERT INTO detalle_compra_material_proveedor (cantidad, precio_compra, id_proveedor, id_compra_material, id_material)
+    INSERT INTO compra_detalle (cantidad, precio_compra, id_proveedor, id_compra, id_material)
     VALUES (?, ?, ?, ?, ?)
   `;
-  const values = [cantidad, precio_compra, id_proveedor, id_compra_material, id_material];
+  const values = [cantidad, precio_compra, id_proveedor, id_compra, id_material];
 
   req.db.query(query, values, (err, result) => {
     if (err) {
@@ -61,14 +61,14 @@ router.post('/', (req, res) => {
 
 // Actualizar un detalle de compra de material por ID
 router.put('/:id', (req, res) => {
-  const { cantidad, precio_compra, id_proveedor, id_compra_material, id_material } = req.body;
+  const { cantidad, precio_compra, id_proveedor, id_compra, id_material } = req.body;
 
   const query = `
-    UPDATE detalle_compra_material_proveedor
-    SET cantidad = ?, precio_compra = ?, id_proveedor = ?, id_compra_material = ?, id_material = ?
-    WHERE id_proveedor_detalle_compra_material = ?
+    UPDATE compra_detalle
+    SET cantidad = ?, precio_compra = ?, id_proveedor = ?, id_compra = ?, id_material = ?
+    WHERE id_compra_detalle = ?
   `;
-  const values = [cantidad, precio_compra, id_proveedor, id_compra_material, id_material, req.params.id];
+  const values = [cantidad, precio_compra, id_proveedor, id_compra, id_material, req.params.id];
 
   req.db.query(query, values, (err, result) => {
     if (err) {
@@ -81,8 +81,8 @@ router.put('/:id', (req, res) => {
 // Eliminar un detalle de compra de material por ID
 router.delete('/:id', (req, res) => {
   const query = `
-    DELETE FROM detalle_compra_material_proveedor
-    WHERE id_proveedor_detalle_compra_material = ?
+    DELETE FROM compra_detalle
+    WHERE id_compra_detalle = ?
   `;
 
   req.db.query(query, [req.params.id], (err, result) => {

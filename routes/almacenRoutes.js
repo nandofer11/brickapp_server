@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router()// Tu archivo de configuración de base de datos
+const almacenController = require('../controllers/almacenController');
 
 /**
  * @swagger
@@ -58,17 +59,7 @@ const router = express.Router()// Tu archivo de configuración de base de datos
  *                   type: string
  */
 //Registrar un nuevo almacén
-router.post('/', (req, res) => {
-    const { codigoAlmacen, nombreAlmacen } = req.body;
-
-    const sql = `INSERT INTO almacen (codigo_almacen, nombre_almacen) VALUES (?, ?)`
-    req.db.query(sql, [codigoAlmacen, nombreAlmacen], (err, result) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
-        res.status(201).send({ id_almacen: result.insertId, message: "Almacén registrado correctamente" });
-    });
-});
+router.post('/', almacenController.register);
 /**
  * @swagger
  * /almacenes:
@@ -95,16 +86,7 @@ router.post('/', (req, res) => {
  *                   type: string
  */
 //Obtener todos los almacenes
-router.get('/', (req, res) => {
-    const sql = "SELECT * from almacen";
-
-    req.db.query(sql, (err, results) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
-        res.send(results);
-    });
-});
+router.get('/', almacenController.getAll);
 
 /**
  * @swagger
@@ -158,21 +140,7 @@ router.get('/', (req, res) => {
  */
 
 // Editar un almacén existente
-router.put('/:id', (req, res) => {
-    const { id } = req.params;
-    const { codigoAlmacen, nombreAlmacen } = req.body;
-
-    const sql = `UPDATE almacen SET codigo_almacen = ?, nombre_almacen = ? WHERE id_almacen = ?`;
-    req.db.query(sql, [codigoAlmacen, nombreAlmacen, id], (err, result) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).send({ message: "Almacén no encontrado" });
-        }
-        res.send({ message: "Almacén actualizado correctamente" });
-    });
-});
+router.put('/:id', almacenController.update);
 
 /**
  * @swagger
@@ -219,19 +187,6 @@ router.put('/:id', (req, res) => {
  *                   type: string
  */
 // Eliminar un almacén
-router.delete('/:id', (req, res) => {
-    const { id } = req.params;
-
-    const sql = `DELETE FROM almacen WHERE id_almacen = ?`;
-    req.db.query(sql, [id], (err, result) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).send({ message: "Almacén no encontrado" });
-        }
-        res.send({ message: "Almacén eliminado correctamente" });
-    });
-});
+router.delete('/:id', almacenController.delete);
 
 module.exports = router;

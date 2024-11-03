@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const proveedorController = require('../controllers/proveedorController');
 
 /**
  * @swagger
@@ -75,16 +76,7 @@ const router = express.Router();
  */
 
 // Obtener todos los proveedores
-router.get('/', (req, res) => {
-  const query = `SELECT * FROM proveedor`;
-
-  req.db.query(query, (err, results) => {
-    if (err) {
-      return res.status(500).send({ error: 'Error al obtener los proveedores.' });
-    }
-    res.json(results);
-  });
-});
+router.get('/', proveedorController.getAll);
 
 /**
  * @swagger
@@ -128,19 +120,7 @@ router.get('/', (req, res) => {
  */
 
 // Obtener un proveedor por ID
-router.get('/:id', (req, res) => {
-  const query = `SELECT * FROM proveedor WHERE id_proveedor = ?`;
-
-  req.db.query(query, [req.params.id], (err, result) => {
-    if (err) {
-      return res.status(500).send({ error: 'Error al obtener el proveedor.' });
-    }
-    if (result.length === 0) {
-      return res.status(404).send({ error: 'Proveedor no encontrado.' });
-    }
-    res.json(result[0]);
-  });
-});
+router.get('/:id', proveedorController.getById);
 
 /**
  * @swagger
@@ -186,22 +166,7 @@ router.get('/:id', (req, res) => {
  */
 
 // Crear un nuevo proveedor
-router.post('/', (req, res) => {
-  const { tipo_documento, nro_documento, nombre, ciudad, telefono, celular, email } = req.body;
-
-  const query = `
-    INSERT INTO proveedor (tipo_documento, nro_documento, nombre, ciudad, telefono, celular, email)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
-  const values = [tipo_documento, nro_documento, nombre, ciudad, telefono, celular, email];
-
-  req.db.query(query, values, (err, result) => {
-    if (err) {
-      return res.status(500).send({ error: 'Error al crear el proveedor.' });
-    }
-    res.status(201).send({ message: 'Proveedor creado con éxito.', id: result.insertId });
-  });
-});
+router.post('/', proveedorController.register);
 
 /**
  * @swagger
@@ -247,23 +212,7 @@ router.post('/', (req, res) => {
  */
 
 // Actualizar un proveedor por ID
-router.put('/:id', (req, res) => {
-  const { tipo_documento, nro_documento, nombre, ciudad, telefono, celular, email } = req.body;
-
-  const query = `
-    UPDATE proveedor
-    SET tipo_documento = ?, nro_documento = ?, nombre = ?, ciudad = ?, telefono = ?, celular = ?, email = ?
-    WHERE id_proveedor = ?
-  `;
-  const values = [tipo_documento, nro_documento, nombre, ciudad, telefono, celular, email, req.params.id];
-
-  req.db.query(query, values, (err, result) => {
-    if (err) {
-      return res.status(500).send({ error: 'Error al actualizar el proveedor.' });
-    }
-    res.send({ message: 'Proveedor actualizado con éxito.' });
-  });
-});
+router.put('/:id', proveedorController.update);
 
 /**
  * @swagger
@@ -288,18 +237,6 @@ router.put('/:id', (req, res) => {
  */
 
 // Eliminar un proveedor por ID
-router.delete('/:id', (req, res) => {
-  const query = `
-    DELETE FROM proveedor
-    WHERE id_proveedor = ?
-  `;
-
-  req.db.query(query, [req.params.id], (err, result) => {
-    if (err) {
-      return res.status(500).send({ error: 'Error al eliminar el proveedor.' });
-    }
-    res.send({ message: 'Proveedor eliminado con éxito.' });
-  });
-});
+router.delete('/:id', proveedorController.delete);
 
 module.exports = router;

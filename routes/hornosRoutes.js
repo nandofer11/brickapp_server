@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const hornoController = require('../controllers/hornoController');
 
 /**
  * @swagger
@@ -46,16 +47,7 @@ const router = express.Router();
  */
 
 // Listar todos los hornos
-router.get('/', (req, res) => {
-    const sql = `SELECT * FROM horno`;
-
-    req.db.query(sql, (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(200).json(results);
-    });
-});
+router.get('/', hornoController.list);
 
 /**
  * @swagger
@@ -84,20 +76,7 @@ router.get('/', (req, res) => {
  */
 
 // Obtener un solo horno por ID
-router.get('/:id', (req, res) => {
-    const { id } = req.params;
-    const sql = `SELECT * FROM horno WHERE id_horno = ?`;
-
-    req.db.query(sql, [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Horno no encontrado' });
-        }
-        res.status(200).json(result[0]);
-    });
-});
+router.get('/:id', hornoController.getById);
 
 /**
  * @swagger
@@ -129,22 +108,7 @@ router.get('/:id', (req, res) => {
  *         description: Error en el servidor
  */
 // Crear un nuevo horno
-router.post('/', (req, res) => {
-    const { prefijo, nombre, cantidad_operadores } = req.body;
-
-    if (!prefijo || !nombre || !cantidad_operadores) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-    }
-
-    const sql = `INSERT INTO horno (prefijo, nombre, cantidad_operadores) VALUES (?, ?, ?)`;
-
-    req.db.query(sql, [prefijo, nombre, cantidad_operadores], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.status(201).json({ message: 'Horno registrado exitosamente', id_horno: result.insertId });
-    });
-});
+router.post('/', hornoController.register);
 
 /**
  * @swagger
@@ -176,26 +140,7 @@ router.post('/', (req, res) => {
  *         description: Error en el servidor
  */
 // Editar un horno
-router.put('/:id', (req, res) => {
-    const { id } = req.params;
-    const { prefijo, nombre, cantidad_operadores } = req.body;
-
-    if (!prefijo || !nombre || !cantidad_operadores) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-    }
-
-    const sql = `UPDATE horno SET prefijo = ?, nombre = ?, cantidad_operadores = ? WHERE id_horno = ?`;
-
-    req.db.query(sql, [prefijo, nombre, cantidad_operadores, id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Horno no encontrado' });
-        }
-        res.status(200).json({ message: 'Horno actualizado exitosamente' });
-    });
-});
+router.put('/:id', hornoController.update);
 
 /**
  * @swagger
@@ -219,21 +164,6 @@ router.put('/:id', (req, res) => {
  *         description: Error en el servidor
  */
 // Eliminar un horno
-router.delete('/:id', (req, res) => {
-    const { id } = req.params;
-
-    const sql = `DELETE FROM horno WHERE id_horno = ?`;
-
-    req.db.query(sql, [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Horno no encontrado' });
-        }
-        res.status(200).json({ message: 'Horno eliminado exitosamente' });
-    });
-});
-
+router.delete('/:id', hornoController.delete);
 
 module.exports = router;

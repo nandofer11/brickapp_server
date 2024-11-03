@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Obtener todas las compras de material
 router.get('/', (req, res) => {
-  const query = `SELECT * FROM compra_material`;
+  const query = `SELECT * FROM compra`;
 
   req.db.query(query, (err, results) => {
     if (err) {
@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
 
 // Obtener una compra de material por ID
 router.get('/:id', (req, res) => {
-  const query = `SELECT * FROM compra_material WHERE id_compra_material = ?`;
+  const query = `SELECT * FROM compra WHERE id_compra = ?`;
 
   req.db.query(query, [req.params.id], (err, result) => {
     if (err) {
@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
   const { fecha_compra, estado_pago } = req.body;
 
   const query = `
-    INSERT INTO compra_material (fecha_compra, estado_pago)
+    INSERT INTO compra (fecha_compra, estado_pago)
     VALUES (?, ?)
   `;
   const values = [fecha_compra, estado_pago];
@@ -53,9 +53,9 @@ router.put('/:id', (req, res) => {
   const { fecha_compra, estado_pago } = req.body;
 
   const query = `
-    UPDATE compra_material
+    UPDATE compra
     SET fecha_compra = ?, estado_pago = ?
-    WHERE id_compra_material = ?
+    WHERE id_compra = ?
   `;
   const values = [fecha_compra, estado_pago, req.params.id];
 
@@ -70,8 +70,8 @@ router.put('/:id', (req, res) => {
 // Eliminar una compra de material por ID
 router.delete('/:id', (req, res) => {
   const query = `
-    DELETE FROM compra_material
-    WHERE id_compra_material = ?
+    DELETE FROM compra
+    WHERE id_compra = ?
   `;
 
   req.db.query(query, [req.params.id], (err, result) => {
