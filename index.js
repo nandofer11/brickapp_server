@@ -59,7 +59,7 @@ const coccionRoutes = require('./routes/coccionRoutes');
 const cargoCoccionRoutes = require('./routes/cargoCoccionRoutes');
 const almacenRoutes = require('./routes/almacenRoutes');
 const materialRoutes = require('./routes/materialRoutes');
-const comprasMaterialRoutes = require('./routes/compra');
+const compraRoutes = require('./routes/compraRoutes');
 const proveedorRoutes = require('./routes/proveedorRoutes');
 
 // Agrupar rutas protegidas usando middleware de autenticación
@@ -71,7 +71,7 @@ app.use('/api/admin/horno', authenticateToken, hornosRoutes);
 app.use('/api/admin/cargococcion', authenticateToken, cargoCoccionRoutes);
 app.use('/api/admin/almacen', authenticateToken, almacenRoutes);
 app.use('/api/admin/material', authenticateToken, materialRoutes);
-app.use('/api/admin/comprasmateriales', authenticateToken, comprasMaterialRoutes);
+app.use('/api/admin/comprasmateriales', authenticateToken, compraRoutes);
 app.use('/api/admin/proveedores', authenticateToken, proveedorRoutes);
 
 // Iniciar el servidor

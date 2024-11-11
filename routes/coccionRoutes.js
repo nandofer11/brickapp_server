@@ -273,4 +273,12 @@ router.get('/', coccionController.getAll);
 // Obtener una sola cocción por ID
 router.get('/:id', coccionController.getById);
 
+router.get('/:id/detalles', coccionController.getCoccionDetails);
+
+// Ruta para obtener cocción en curso en el horno H2
+router.get('/horno/H2/encurso', coccionController.getCoccionEnCurso);
+
+// Ruta para actualizar la cocción y el detalle de cocción
+router.put('/coccion_detalles/:id', coccionController.actualizarDetalleCoccion);
+
 module.exports = router;

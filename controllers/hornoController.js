@@ -1,15 +1,15 @@
 const Horno = {
     // Función para registrar un horno
     register: (req, res) => {
-        const { prefijo, nombre, cantidad_operadores } = req.body;
+        const { prefijo, nombre, cantidad_humeadores, cantidad_quemadores } = req.body;
 
-        if (!prefijo || !nombre || !cantidad_operadores) {
+        if (!prefijo || !nombre || !cantidad_humeadores || !cantidad_quemadores) {
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
-        const sql = `INSERT INTO horno (prefijo, nombre, cantidad_operadores) VALUES (?, ?, ?)`;
+        const sql = `INSERT INTO horno (prefijo, nombre, cantidad_humeadores, cantidad_quemadores) VALUES (?, ?, ?)`;
 
-        req.db.query(sql, [prefijo, nombre, cantidad_operadores], (err, result) => {
+        req.db.query(sql, [prefijo, nombre, cantidad_humeadores, cantidad_quemadores], (err, result) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }
@@ -48,15 +48,15 @@ const Horno = {
     // Función para actualizar un horno
     update: (req, res) => {
         const { id } = req.params;
-        const { prefijo, nombre, cantidad_operadores } = req.body;
+        const { prefijo, nombre, cantidad_humeadores, cantidad_quemadores } = req.body;
 
-        if (!prefijo || !nombre || !cantidad_operadores) {
+        if (!prefijo || !nombre || !cantidad_humeadores || !cantidad_quemadores) {
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
-        const sql = `UPDATE horno SET prefijo = ?, nombre = ?, cantidad_operadores = ? WHERE id_horno = ?`;
+        const sql = `UPDATE horno SET prefijo = ?, nombre = ?, cantidad_humeadores = ?, cantidad_quemadores = ? WHERE id_horno = ?`;
 
-        req.db.query(sql, [prefijo, nombre, cantidad_operadores, id], (err, result) => {
+        req.db.query(sql, [prefijo, nombre, cantidad_humeadores, cantidad_quemadores, id], (err, result) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }
