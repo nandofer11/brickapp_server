@@ -7,12 +7,16 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const db = require('./config/db');  // Importa la conexión a la base de datos
 const authenticateToken = require('./middlewares/authenticateToken');
 
+const jwt = require('jsonwebtoken');
+
 // Inicializar app de Express
 const app = express();
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: '*',  // Permitir todas las conexiones o especificar las IPs permitidas
+}));
 
 // Conectar la base de datos en cada solicitud
 app.use((req, res, next) => {
@@ -31,7 +35,7 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:3002/api/admin',
+                url: 'http://192.168.122.234:3002/api/admin',
                 description: 'Servidor de desarrollo'
             }
         ],
@@ -73,6 +77,21 @@ app.use('/api/admin/almacen', authenticateToken, almacenRoutes);
 app.use('/api/admin/material', authenticateToken, materialRoutes);
 app.use('/api/admin/comprasmateriales', authenticateToken, compraRoutes);
 app.use('/api/admin/proveedores', authenticateToken, proveedorRoutes);
+
+// ruta para generar token temporal para el ESP32
+app.post('/api/token-esp32', (req, res) => {
+    try {
+        const espToken = jwt.sign(
+            { device: 'ESP32' }, // Datos del token
+            process.env.JWT_SECRET, // Clave secreta
+            { expiresIn: '96h' } // Duración: 96 horas (4 días)
+        );
+        res.status(200).json({ token: espToken });
+    } catch (error) {
+        console.error("Error generando token para ESP32:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 3002;
