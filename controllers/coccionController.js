@@ -1,95 +1,76 @@
 const coccionController = {
-    // Crear una nueva cocción
-    register: async (req, res) => {
-        const {
-            fecha_encendido,
-            hora_inicio,
-            fecha_apagado,
-            hora_fin,
-            humedad_inicial,
-            estado,
-            horno_id_horno,
-            operadoresCoccion,
-        } = req.body;
+    register: (req, res) => {
+        const { fecha_encendido, horno_id_horno, operadoresCoccion, consumosMateriales } = req.body;
 
-        // Verificar si ya existe una cocción "En curso" para el mismo horno
-        req.db.query(
-            `SELECT * FROM coccion WHERE horno_id_horno = ? AND estado = 'En curso'`,
-            [horno_id_horno],
-            (err, results) => {
-                if (err) {
-                    return res.status(500).json({ error: err.message });
-                }
+        // Validar datos requeridos
+        if (!fecha_encendido || !horno_id_horno) {
+            return res.status(400).json({ message: "Datos incompletos o inválidos" });
+        }
 
-                // Verificamos si hay una cocción en curso
-                if (results && results.length > 0) {
-                    return res.status(400).json({
-                        message: 'Ya existe una cocción "En curso" para este horno. No se puede registrar una nueva hasta que la cocción actual esté finalizada.'
-                    });
-                }
+        // Consulta para insertar la cocción
+        const insertCoccionSql = `
+        INSERT INTO coccion (fecha_encendido, estado, horno_id_horno, humeada, quema) 
+        VALUES (?, 'En curso', ?, 0, 0)
+    `;
 
-                // Construimos el objeto con los datos de la cocción
-                const coccionData = {
-                    fecha_encendido: fecha_encendido,
-                    hora_inicio: hora_inicio || null,
-                    fecha_apagado: fecha_apagado || null,  // Opcional
-                    hora_fin: hora_fin || null,            // Opcional
-                    humedad_inicial: humedad_inicial || null,
-                    estado: estado || 'En curso',         // Asignar estado por defecto si no se especifica
-                    horno_id_horno: horno_id_horno,
-                };
-
-                const sqlCoccion = `
-                    INSERT INTO coccion (fecha_encendido, hora_inicio, fecha_apagado, hora_fin, humedad_inicial, estado, horno_id_horno)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                `;
-                const coccionValues = [
-                    coccionData.fecha_encendido,
-                    coccionData.hora_inicio,
-                    coccionData.fecha_apagado,
-                    coccionData.hora_fin,
-                    coccionData.humedad_inicial,
-                    coccionData.estado,
-                    coccionData.horno_id_horno,
-                ];
-
-                // Ejecutar la consulta para insertar la cocción
-                req.db.query(sqlCoccion, coccionValues, (err, result) => {
-                    if (err) {
-                        return res.status(500).json({ error: err.message });
-                    }
-
-                    const coccionId = result.insertId; // Obtenemos el ID de la cocción registrada
-
-                    // Ahora registrar los operadores asociados a la cocción en la tabla detalle_coccion
-                    if (operadoresCoccion && operadoresCoccion.length > 0) {
-                        const sqlOperadorCoccion = `
-                            INSERT INTO detalle_coccion 
-                            (coccion_id_coccion, cargo_coccion_id_cargo_coccion, material_id_material, cantidad_usada, personal_id_personal)
-                            VALUES ?
-                        `;
-                        const values = operadoresCoccion.map(item => [
-                            coccionId, // El ID de la cocción registrada
-                            item.cargo_coccion_id_cargo_coccion, // Corrige el acceso al ID del cargo
-                            item.material_id_material || null,     // Si no se proporciona, se asigna null
-                            item.cantidad_usada || null,           // Si no se proporciona, se asigna null
-                            item.personal_id_personal,
-                        ]);
-
-                        req.db.query(sqlOperadorCoccion, [values], (err, result) => {
-                            if (err) {
-                                return res.status(500).json({ error: err.message });
-                            }
-
-                            res.status(201).json({ message: 'Cocción y operadores registrados correctamente', coccionId });
-                        });
-                    } else {
-                        // Si no hay operadores asociados, solo registrar la cocción
-                        res.status(201).json({ message: 'Cocción registrada sin operadores asociados', coccionId });
-                    }
-                });
+        req.db.query(insertCoccionSql, [fecha_encendido, horno_id_horno], (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
             }
-        );
+
+            // Obtener el ID de la cocción recién creada
+            const coccionId = result.insertId;
+
+            // Promesas para manejar las consultas asincrónicas
+            const queries = [];
+
+            // Insertar operadores en coccion_operador
+            if (operadoresCoccion && operadoresCoccion.length > 0) {
+                const operadoresValues = operadoresCoccion
+                    .map(op => `(${coccionId}, ${op.personal_id_personal}, ${op.cargo_coccion_id_cargo_coccion})`)
+                    .join(", ");
+                const insertOperadoresSql = `
+                INSERT INTO coccion_operador (coccion_id_coccion, personal_id_personal, cargo_coccion_id_cargo_coccion)
+                VALUES ${operadoresValues}
+            `;
+                queries.push(
+                    new Promise((resolve, reject) => {
+                        req.db.query(insertOperadoresSql, (err) => {
+                            if (err) return reject(`Error al insertar operadores: ${err.message}`);
+                            resolve();
+                        });
+                    })
+                );
+            }
+
+            // Insertar consumos de material en consumo_material
+            if (consumosMateriales && consumosMateriales.length > 0) {
+                const consumosValues = consumosMateriales
+                    .map(consumo => `(${coccionId}, ${consumo.material_id_material}, ${consumo.personal_id_personal || null}, ${consumo.cantidad_consumida || null})`)
+                    .join(", ");
+                const insertConsumosSql = `
+                INSERT INTO consumo_material (coccion_id_coccion, material_id_material, personal_id_personal, cantidad_consumida)
+                VALUES ${consumosValues}
+            `;
+                queries.push(
+                    new Promise((resolve, reject) => {
+                        req.db.query(insertConsumosSql, (err) => {
+                            if (err) return reject(`Error al insertar consumos de material: ${err.message}`);
+                            resolve();
+                        });
+                    })
+                );
+            }
+
+            // Ejecutar todas las promesas
+            Promise.all(queries)
+                .then(() => {
+                    res.status(201).json({ message: "Cocción registrada con éxito.", coccionId });
+                })
+                .catch((error) => {
+                    res.status(500).json({ error });
+                });
+        });
     },
 
     // Obtener todas las cocciones
@@ -157,22 +138,27 @@ const coccionController = {
 
         const sql = `
         SELECT 
-            c.fecha_encendido,
-            c.hora_inicio,
-            c.fecha_apagado,
-            c.hora_fin,
-            c.estado,
-            h.nombre AS nombre_horno,
-            h.prefijo,
-            d.cargo_coccion_id_cargo_coccion,
-            cc.nombre_cargo,
-            p.nombre_completo AS nombre_operador
-        FROM coccion c
-        INNER JOIN horno h ON c.horno_id_horno = h.id_horno
-        LEFT JOIN detalle_coccion d ON c.id_coccion = d.coccion_id_coccion
-        LEFT JOIN cargo_coccion cc ON d.cargo_coccion_id_cargo_coccion = cc.id_cargo_coccion
-        LEFT JOIN personal p ON d.personal_id_personal = p.id_personal
-        WHERE c.id_coccion = ?
+    c.fecha_encendido,
+    c.hora_inicio,
+    c.fecha_apagado,
+    c.hora_fin,
+    c.estado,
+    h.prefijo,
+    h.nombre AS nombre_horno,
+    p.nombre_completo AS nombre_operador,
+    cc.nombre_cargo
+FROM 
+    coccion c
+INNER JOIN 
+    horno h ON c.horno_id_horno = h.id_horno
+LEFT JOIN 
+    coccion_operador co ON c.id_coccion = co.coccion_id_coccion
+LEFT JOIN 
+    cargo_coccion cc ON co.cargo_coccion_id_cargo_coccion = cc.id_cargo_coccion
+LEFT JOIN 
+    personal p ON co.personal_id_personal = p.id_personal
+WHERE 
+    c.id_coccion = ?
     `;
 
         req.db.query(sql, [coccionId], (err, results) => {
@@ -496,7 +482,7 @@ const coccionController = {
                     timestamp
                 ) VALUES (?, ?, ?, ?, ?, NOW());
             `;
-            
+
 
             req.db.query(
                 query,
