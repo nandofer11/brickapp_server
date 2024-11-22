@@ -1,7 +1,8 @@
 const Personal = {
     // Función para registrar un trabajador
     register: (req, res) => {
-        const { dni, nombre_completo, ciudad, direccion, celular, pago_dia, fecha_ingreso, estado } = req.body;
+        const { dni, nombre_completo, ciudad, direccion, celular, pago_dia, fecha_ingreso } = req.body;
+        const estado = 1; // Establecer el estado por defecto a 1
         const SQL = 'INSERT INTO personal (dni, nombre_completo, ciudad, direccion, celular, pago_dia, fecha_ingreso, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         const Values = [dni, nombre_completo, ciudad, direccion, celular, pago_dia, fecha_ingreso, estado];
 

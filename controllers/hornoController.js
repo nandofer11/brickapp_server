@@ -7,7 +7,7 @@ const Horno = {
             return res.status(400).json({ error: 'Todos los campos son obligatorios' });
         }
 
-        const sql = `INSERT INTO horno (prefijo, nombre, cantidad_humeadores, cantidad_quemadores) VALUES (?, ?, ?)`;
+        const sql = `INSERT INTO horno (prefijo, nombre, cantidad_humeadores, cantidad_quemadores) VALUES (?, ?, ?, ?)`;
 
         req.db.query(sql, [prefijo, nombre, cantidad_humeadores, cantidad_quemadores], (err, result) => {
             if (err) {

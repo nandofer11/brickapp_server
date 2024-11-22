@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router()// Tu archivo de configuración de base de datos
-const coccionController =  require('../controllers/coccionController');
+const coccionController = require('../controllers/coccionController');
 
 
 /**
@@ -279,7 +279,7 @@ router.get('/:id/detalles', coccionController.getCoccionDetails);
 router.get('/horno/H2/encurso', coccionController.getCoccionEnCurso);
 
 // Ruta para iniciar la quema con humeada
-router.put('/iniciarcoccion/:id', coccionController.iniciarCoccion);
+router.put('/iniciarcoccion/:id', coccionController.actualizarEstadoCoccion);
 
 // Ruta para cambiar el proceso de humeada a quema
 router.put('/cambiar_quema/:id', coccionController.cambiarProcesoQuema);
@@ -291,6 +291,9 @@ router.post('/sensores', coccionController.registrarDatosSensor);
 
 // Ruta para obtener registros de temperatura de una cocción específica
 router.get('/:id_coccion/registros', coccionController.obtenerRegistrosCoccion);
+
+// Ruta para actualizar el detalle de coccion del modal ingresar cantidad por operador
+router.post('/registrarcantidaddetallecoccion/', coccionController.registrarCantidadDetalleCoccion);
 
 
 module.exports = router;
