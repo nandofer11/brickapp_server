@@ -18,4 +18,7 @@ router.put('/:id', compraController.update);
 // Eliminar una compra de material por ID
 router.delete('/:id', compraController.delete);
 
+// Obtener compra detalle
+router.post('/obtenercompradetalles', compraController.obtenerCompraDetalles);
+
 module.exports = router;

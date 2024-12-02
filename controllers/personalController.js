@@ -2,12 +2,16 @@ const Personal = {
     // Función para registrar un trabajador
     register: (req, res) => {
         const { dni, nombre_completo, ciudad, direccion, celular, pago_dia, fecha_ingreso } = req.body;
-        const estado = 1; // Establecer el estado por defecto a 1
+        const estado = 1; // Estado por defecto
         const SQL = 'INSERT INTO personal (dni, nombre_completo, ciudad, direccion, celular, pago_dia, fecha_ingreso, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         const Values = [dni, nombre_completo, ciudad, direccion, celular, pago_dia, fecha_ingreso, estado];
 
         req.db.query(SQL, Values, (err, results) => {
             if (err) {
+                // Validar si es un error de entrada duplicada
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).send({ message: 'Error: El DNI ya está registrado.' });
+                }
                 return res.status(500).send({ error: err });
             }
             res.send({ message: 'Trabajador registrado con éxito', id_personal: results.insertId });
@@ -53,6 +57,10 @@ const Personal = {
 
         req.db.query(SQL, Values, (err, results) => {
             if (err) {
+                // Validar si es un error de entrada duplicada
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).send({ message: 'Error: El DNI ya está registrado.' });
+                }
                 return res.status(500).send({ error: err });
             }
             if (results.affectedRows > 0) {

@@ -275,25 +275,20 @@ router.get('/:id', coccionController.getById);
 
 router.get('/:id/detalles', coccionController.getCoccionDetails);
 
-// Ruta para obtener cocción en curso en el horno H2
-router.get('/horno/H2/encurso', coccionController.getCoccionEnCurso);
+router.post('/encurso', coccionController.getCoccionesEnCurso);
+router.put('/:id/iniciarhumeada', coccionController.iniciarHumeada);
+router.put('/:id/iniciarquema', coccionController.iniciarQuema);
+router.get('/:id/operadores', coccionController.renderizarOperadores);
+router.post('/consumomaterial', coccionController.registrarConsumoMaterial);
+router.get('/:coccionId/:personalId/:materialId/consumosdematerial', coccionController.getHistorialConsumo);
+router.delete('/consumo/:idConsumo', coccionController.eliminarConsumoMaterial);
+router.put('/:id/finalizarcoccion', coccionController.finalizarCoccion);
 
-// Ruta para iniciar la quema con humeada
-router.put('/iniciarcoccion/:id', coccionController.actualizarEstadoCoccion);
-
-// Ruta para cambiar el proceso de humeada a quema
-router.put('/cambiar_quema/:id', coccionController.cambiarProcesoQuema);
-
-// Ruta para finalizar la cocción
-router.put('/finalizar_coccion/:id', coccionController.finalizarCoccion);
 
 router.post('/sensores', coccionController.registrarDatosSensor);
 
 // Ruta para obtener registros de temperatura de una cocción específica
 router.get('/:id_coccion/registros', coccionController.obtenerRegistrosCoccion);
-
-// Ruta para actualizar el detalle de coccion del modal ingresar cantidad por operador
-router.post('/registrarcantidaddetallecoccion/', coccionController.registrarCantidadDetalleCoccion);
 
 
 module.exports = router;

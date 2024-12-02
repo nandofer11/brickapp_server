@@ -15,7 +15,10 @@ const app = express();
 // Middlewares
 app.use(express.json());
 app.use(cors({
-    origin: '*',  // Permitir todas las conexiones o especificar las IPs permitidas
+    // origin: 'https://brickapp-frontend.fly.dev/', // Cambia esto al dominio de tu app frontend
+    // methods: 'GET,POST,PUT,DELETE',
+    // allowedHeaders: 'Content-Type,Authorization',
+    origin: '*',
 }));
 
 // Conectar la base de datos en cada solicitud

@@ -114,6 +114,55 @@ const compraController = {
             }
             res.send({ message: 'Compra de material eliminada con éxito.' });
         });
+    },
+
+    obtenerCompraDetalles: (req, res) => {
+        try {
+            const query = `
+            SELECT 
+                c.id_compra AS 'ID Compra',
+                c.fecha_compra AS 'Fecha Compra',
+                c.estado_pago AS 'Estado Pago',
+                CASE 
+                    WHEN c.destino_quema = 1 THEN 'Quema'
+                    WHEN c.destino_quema = 0 THEN 'Almacén'
+                    ELSE 'Indefinido'
+                END AS 'Destino',
+                a.nombre_almacen AS 'Nombre Almacén',
+                p.nombre AS 'Proveedor',
+                p.tipo_documento AS 'Tipo Documento',
+                p.nro_documento AS 'Nro Documento',
+                cd.cantidad AS 'Cantidad',
+                cd.precio_unitario_compra AS 'Precio Unitario',
+                (cd.cantidad * cd.precio_unitario_compra) AS 'Subtotal',
+                m.nombre AS 'Material',
+                m.presentacion AS 'Presentación Material'
+            FROM 
+                compra c
+            LEFT JOIN 
+                almacen a ON c.almacen_id_almacen = a.id_almacen
+            INNER JOIN 
+                proveedor p ON c.proveedor_id_proveedor = p.id_proveedor
+            INNER JOIN 
+                compra_detalle cd ON c.id_compra = cd.id_compra
+            INNER JOIN 
+                material m ON cd.id_material = m.id_material
+            ORDER BY 
+                c.fecha_compra DESC, c.id_compra;
+        `;
+
+            req.db.query(query, (err, results) => {
+                if (err) {
+                    console.error('Error al obtener detalles de compras:', err);
+                    return res.status(500).json({ error: 'Error interno del servidor.' });
+                }
+
+                return res.status(200).json(results);
+            });
+        } catch (error) {
+            console.error('Error inesperado:', error);
+            return res.status(500).json({ error: 'Error interno del servidor.' });
+        }
     }
 };
 
