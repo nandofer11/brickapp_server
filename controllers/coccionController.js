@@ -366,69 +366,59 @@ WHERE
 
     registrarConsumoMaterial: async (req, res) => {
         try {
-            const { coccionId, personalId, materiales } = req.body;
-            // `materiales` es un array de objetos: [{ materialId, cantidadConsumida }, ...]
-
+            const { id_coccion, id_personal, id_material, cantidad_consumida } = req.body;
+    
             // Verificar si la cocción existe
             const coccionQuery = `SELECT id_coccion FROM coccion WHERE id_coccion = ?`;
-
-            req.db.query(coccionQuery, [coccionId], (err, coccion) => {
+    
+            req.db.query(coccionQuery, [id_coccion], (err, coccion) => {
                 if (err) {
                     console.error('Error al verificar cocción:', err);
                     return res.status(500).json({ mensaje: 'Error al verificar cocción.' });
                 }
-
+    
                 if (coccion.length === 0) {
                     return res.status(404).json({ mensaje: 'Cocción no encontrada.' });
                 }
-
+    
                 // Verificar si el personal está asignado a la cocción
                 const operadorQuery = `
                     SELECT co.id_coccion_operador 
                     FROM coccion_operador co
                     WHERE co.coccion_id_coccion = ? AND co.personal_id_personal = ?;
                 `;
-
-                req.db.query(operadorQuery, [coccionId, personalId], (err, operador) => {
+    
+                req.db.query(operadorQuery, [id_coccion, id_personal], (err, operador) => {
                     if (err) {
                         console.error('Error al verificar operador:', err);
                         return res.status(500).json({ mensaje: 'Error al verificar operador.' });
                     }
-
+    
                     if (operador.length === 0) {
                         return res.status(403).json({ mensaje: 'El personal no está asignado a esta cocción.' });
                     }
-
+    
                     // Insertar el consumo de material
                     const consumoQuery = `
                         INSERT INTO consumo_material (timestamp, material_id_material, personal_id_personal, coccion_id_coccion, cantidad_consumida)
                         VALUES (NOW(), ?, ?, ?, ?);
                     `;
-
-                    // Insertar todos los consumos de materiales
-                    materiales.forEach((material) => {
-                        req.db.query(consumoQuery, [
-                            material.materialId,
-                            personalId,
-                            coccionId,
-                            material.cantidadConsumida,
-                        ], (err, result) => {
-                            if (err) {
-                                console.error('Error al registrar consumo de material:', err);
-                                return res.status(500).json({ mensaje: 'Error al registrar consumo de material.' });
-                            }
-                        });
+    
+                    req.db.query(consumoQuery, [id_material, id_personal, id_coccion, cantidad_consumida], (err, result) => {
+                        if (err) {
+                            console.error('Error al registrar consumo de material:', err);
+                            return res.status(500).json({ mensaje: 'Error al registrar consumo de material.' });
+                        }
+    
+                        return res.status(201).json({ mensaje: 'Consumo de material registrado con éxito.' });
                     });
-
-                    return res.status(201).json({ mensaje: 'Consumo de material registrado con éxito.' });
                 });
             });
-
         } catch (error) {
             console.error('Error al registrar consumo de material:', error);
             return res.status(500).json({ mensaje: 'Error al registrar el consumo de material.' });
         }
-    },
+    },    
 
     // Obtener historial de consumo de material por operador y cocción
     getHistorialConsumo: async (req, res) => {
