@@ -1,0 +1,22 @@
+2024/12/05-17:57:44.274 7dc Reusing MANIFEST D:\Upao\Taller\brickapp\server\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2024/12/05-17:57:44.292 7dc Recovering log #50
+2024/12/05-17:57:44.348 7dc Reusing old log D:\Upao\Taller\brickapp\server\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000050.log 
+2024/12/05-17:57:49.756 7dc Level-0 table #55: started
+2024/12/05-17:57:49.770 7dc Level-0 table #55: 219156 bytes OK
+2024/12/05-17:57:49.772 7dc Delete type=0 #50
+2024/12/05-17:57:49.773 7dc Manual compaction at level-0 from '\x00\x1a\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x1b\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/12/05-17:57:49.943 2f8c Compacting 1@1 + 1@2 files
+2024/12/05-17:57:50.062 2f8c Generated table #56@1: 34106 keys, 1396467 bytes
+2024/12/05-17:57:50.062 2f8c Compacted 1@1 + 1@2 files => 1396467 bytes
+2024/12/05-17:57:50.063 2f8c compacted to: files[ 0 0 1 0 0 0 0 ]
+2024/12/05-17:58:17.902 2f8c Level-0 table #58: started
+2024/12/05-17:58:17.944 2f8c Level-0 table #58: 977487 bytes OK
+2024/12/05-17:58:17.946 2f8c Delete type=2 #52
+2024/12/05-17:58:17.946 2f8c Delete type=0 #54
+2024/12/05-17:58:17.946 2f8c Delete type=2 #55
+2024/12/05-17:58:17.959 2f8c Compacting 1@1 + 1@2 files
+2024/12/05-17:58:18.123 2f8c Generated table #59@1: 37610 keys, 1541988 bytes
+2024/12/05-17:58:18.123 2f8c Compacted 1@1 + 1@2 files => 1541988 bytes
+2024/12/05-17:58:18.124 2f8c compacted to: files[ 0 0 1 0 0 0 0 ]
+2024/12/05-17:58:18.124 2f8c Delete type=2 #56
+2024/12/05-17:58:18.124 2f8c Delete type=2 #58

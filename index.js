@@ -9,6 +9,8 @@ const authenticateToken = require('./middlewares/authenticateToken');
 
 const jwt = require('jsonwebtoken');
 
+const {whatsapp} = require('./libs/whatsappService');
+
 // Inicializar app de Express
 const app = express();
 
@@ -48,6 +50,9 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+app.use('/api/admin', require('./routes/links'));
+whatsapp.initialize();
 
 // Rutas de autenticación
 const authRoutes = require('./routes/authRoutes');

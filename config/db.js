@@ -7,7 +7,8 @@ const db = mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     password: process.env.DB_PASSWORD || 'root',
     database: process.env.DB_NAME || 'bdbrickapp',
-    port: process.env.DB_PORT || 3306
+    port: process.env.DB_PORT || 3306,
+    connectTimeout: 10000,
 });
 
 db.connect((err) => {
